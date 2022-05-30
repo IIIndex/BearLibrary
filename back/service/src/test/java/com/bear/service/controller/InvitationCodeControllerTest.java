@@ -27,7 +27,7 @@ class InvitationCodeControllerTest {
     private MockMvc mvc;
 
     // update every 2 hours
-    String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Iiwic3ViIjoiMSIsIm5hbWUiOiJJbmRleCIsImV4cCI6MTY1MzQxNTYzOCwiaWF0IjoxNjUzNDA4NDM4LCJqdGkiOiJjY2RhYTEzY2IzNzg0NGZlYWIxZDFiMzhiYzAwOTUwMSJ9.89dYn80rtJ0fueCM4II5XsORWWRwK9auhFw6IAo3QBI";
+    String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Iiwic3ViIjoiMSIsIm5hbWUiOiJJbmRleCIsImV4cCI6MTY1MzkyMzYxNSwiaWF0IjoxNjUzOTE2NDE1LCJqdGkiOiIzYWE1OTU5NWExYjE0ZjVkYjI4Y2U0M2ExMzZhOTU4MiJ9.djie-bpFF_jQFcfBsEJtXbJMpsjEHXmpPY0Q0tPm83o";
     String token_user = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1Iiwic3ViIjoiMCIsIm5hbWUiOiJ4ZWRuSSIsImV4cCI6MTY1MzQxODMwMCwiaWF0IjoxNjUzNDExMTAwLCJqdGkiOiJiNWEyOTUzMjBhOTU0N2NhYWFmNjYwMTExZTIwYzc2YyJ9.nJ6ISZ9XH-2pdfIqC1fQ86J_6UCzLBHw1GlL2MxzMhU";
 
     @Test
@@ -132,7 +132,7 @@ class InvitationCodeControllerTest {
     void create6() throws Exception{
         String requestJSON = "{\n" +
                 "\t\"code\": \"testcode\",\n" +
-                "\t\"validTime\": \"2022-05-09T13:56:16.000\"\n" +
+                "\t\"validTime\": \"2122-05-09T13:56:16.000\"\n" +
                 "}";
 
         String responseString = this.mvc.perform(put("/invitation_code/invitation_code")
@@ -144,6 +144,28 @@ class InvitationCodeControllerTest {
         String expected = "{\n" +
                 "\t\"msg\":\"未登录，或者token不合法\",\n" +
                 "\t\"status\":401\n" +
+                "}";
+
+        JSONAssert.assertEquals(expected, responseString, false);
+    }
+
+    @Test
+    @Transactional
+    void create7() throws Exception{
+        String requestJSON = "{\n" +
+                "\t\"code\": \"testcode\",\n" +
+                "\t\"validTime\": \"2122-05-09T13:56:16.000\"\n" +
+                "}";
+
+        String responseString = this.mvc.perform(put("/invitation_code/invitation_code")
+                .header("Authorization", token)
+                .contentType("application/json;charset=UTF-8").content(requestJSON))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String expected = "{\n" +
+                "\t\"msg\":\"该邀请码已存在\",\n" +
+                "\t\"status\":903\n" +
                 "}";
 
         JSONAssert.assertEquals(expected, responseString, false);
